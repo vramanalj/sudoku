@@ -1,4 +1,4 @@
-const initialBoards = [
+export const initialBoards = [
   [[8,5,6,0,1,4,7,3,0],
    [0,9,0,0,0,0,0,0,0],
    [2,4,0,0,0,0,1,6,0],
