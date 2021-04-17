@@ -19,4 +19,26 @@
 .App-content {
   margin-top: 1rem;
   display: flex;
+  justify-content: space-around;
+}
+
+.rulesStats, .puzzleArea{
+  
+}
+
+.puzzleTopButtons, .puzzleBottomButtons{
+  display: flex;
+  justify-content: space-between;
+}
+
+.timerText{
+  font-size: 1.5rem;
+  color: #2E335C;
+  font-weight: 700;
+}
+
+.disabled{
+  pointer-events: none;
+  opacity: 0.3;
+  background-color: #2E335C;
 }
