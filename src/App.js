@@ -1,15 +1,19 @@
 import './App.scss';
 import SudokuInputBox from './components/SudokuInputBox';
-import { indexOf, cloneDeep, flatten } from 'lodash'
+import { indexOf, cloneDeep, flatten, lastIndexOf } from 'lodash'
 import {initialBoards} from './initialBoards';
 import React, { useState, useEffect, useRef } from 'react';
-import { useStopwatch, useTimer } from 'react-timer-hook';
-
+import { useStopwatch, useTimer, } from 'react-timer-hook';
 
 function App() {
   let currentBoardOriginalData = useRef([]);
   const[boardData,setBoardData] = useState([]);
   const[gameStatus,setGameStatus] = useState('Not Started');
+  const[showResultFlag,setShowResultFlag] = useState(false);
+  const[gamesPlayed, setGamesPlayed] = useState(0);
+  const[gamesWon, setGamesWon] = useState(0);
+  const[timeRecords, setTimeRecords] = useState([]);
+
   const expiryTimer = new Date();
   expiryTimer.setHours(expiryTimer.getHours() + 24); 
   const {
@@ -88,7 +92,7 @@ function App() {
     return true;
   }
 
-  function gridDuplicatePresent(boardDataToValidate,row,col,val){
+  function gridDuplicatePresent(boardDataToValidate,row,col,val=undefined){
     const gridGroups=[[0,1,2],[3,4,5],[6,7,8]];
     let gridRowsToCheck=flatten(gridGroups.filter((grid=>{
       return grid.includes(row)
@@ -103,35 +107,66 @@ function App() {
         gridData.push(boardDataToValidate[rowIndex][colIndex])
       )
     )
-    let duplicateFoundinGrid = indexOf(gridData,val) > -1
-    return duplicateFoundinGrid;
+    if(val){
+      let duplicateFoundinGrid = indexOf(gridData,val) > -1
+      return duplicateFoundinGrid;
+    }else{
+      let duplicateFoundinGrid = indexOf(gridData,boardDataToValidate[row][col]) !== lastIndexOf(gridData,boardDataToValidate[row][col]);
+      return duplicateFoundinGrid;
+    }
+
   }
 
-  function rowDuplicatePresent(boardDataToValidate,row,col,val){
+  function rowDuplicatePresent(boardDataToValidate,row,col,val=undefined){
     let rowData=[];
     Array.from(Array(9).keys()).map(index=>
       rowData.push(boardDataToValidate[row][index])
     );
-    let duplicateFoundinRow = indexOf(rowData,val) > -1
-    return duplicateFoundinRow;
+    // if a value is passed check for it's presence in a row or just find out if there are any duplicates in a row
+    if(val){
+      let duplicateFoundinRow = indexOf(rowData,val) > -1
+      return duplicateFoundinRow;
+    }else{
+      let duplicateFoundinRow = indexOf(rowData,boardDataToValidate[row][col]) !== lastIndexOf(rowData,boardDataToValidate[row][col]);
+      return duplicateFoundinRow
+    }
+
   }
 
-  function colDuplicatePresent(boardDataToValidate,row,col,val){
+  function colDuplicatePresent(boardDataToValidate,row,col,val=undefined){
     let columnData=[];
     Array.from(Array(9).keys()).map(index=>
       columnData.push(boardDataToValidate[index][col])
     );
-    let duplicateFoundinColumn = indexOf(columnData,val) > -1
-    return duplicateFoundinColumn;
+    if(val){
+      let duplicateFoundinColumn = indexOf(columnData,val) > -1
+      return duplicateFoundinColumn;
+    }else{
+      let duplicateFoundinColumn = indexOf(columnData,boardDataToValidate[row][col]) !== lastIndexOf(columnData,boardDataToValidate[row][col]);
+      return duplicateFoundinColumn;
+    }
   }
 
-  function isSudokuSolved(data){
-   let result = data.filter((row)=>
-      row.indexOf(0)>-1
-    )
-    if(result.length>0){
-      return false;
+  function isSudokuSolved(data,showResult=false){
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if(rowDuplicatePresent(data,i,j) || colDuplicatePresent(data,i,j) || gridDuplicatePresent(data,i,j) || 
+        data[i][j]===0 || isNaN(data[i][j])){
+          console.log("Failed");
+          setGamesPlayed(gamesPlayed+1);
+          showResult && setShowResultFlag('Fail');
+          return false;
+        }
+      }
     }
+    console.log("Passed");
+    showResult && setShowResultFlag('Pass');
+    setGamesPlayed(gamesPlayed+1);
+    setGamesWon(gamesWon+1);
+    let newArr = [...timeRecords];
+    newArr.push([minutes.toString().padStart(2, '0')+" : "+seconds.toString().padStart(2, '0')]);
+    setTimeRecords(newArr)
+    pause();
     return true;
   }
   
@@ -161,17 +196,49 @@ function App() {
         Sudoku
       </header>
       <div className="App-content">
-        <aside className="rulesStats">
-          Rules & Stats
+        <aside className="rulesStats has-text-left">
+          <div className="content">
+            <h5 className="title is-size-6	">Rules </h5>
+            <div className="pl-5">
+              <p>The goal of Sudoku is to fill in a 9×9 grid with digits so that each column, row, and 3×3 section contain the numbers between 1 to 9. 
+                At the beginning of the game, the 9×9 grid will have some of the squares filled in. 
+                Your job is to use logic to fill in the missing digits and complete the grid. Don’t forget, a move is incorrect if:
+              </p>
+              <div className="">
+                <ul>
+                  <li> Any row contains more than one of the same number from 1 to 9 </li>
+                  <li> Any column contains more than one of the same number from 1 to 9 </li>
+                  <li> Any 3×3 grid contains more than one of the same number from 1 to 9 </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="content">
+            <h5 className="title is-6">Stats </h5>
+            <div className='stats'>
+              <div className="statLabels pl-5">
+                <div><span>Games Finished</span></div>
+                <div><span>Games Won</span></div>
+                <div><span>Best Time</span></div>
+              </div>
+              <div className="statValues">
+                <div><span>{gamesPlayed}</span></div>
+                <div><span>{gamesWon}</span></div>
+                <div><span>{timeRecords[0]}</span></div>
+              </div>
+            </div>
+          </div>
         </aside>
         <main className="puzzleArea">
-          <div className="puzzleTopButtons mb-2 buttons are-medium">
+          <div className="puzzleAreaContent">
+          <div className="puzzleTopButtons mb-2 buttons">
             {gameStatus==='In Progress' && <button className="button is-link" onClick={pauseGame}>Pause Game</button>}
             {gameStatus==='Paused' && <button className="button is-link" onClick={resumeGame}>Resume Game</button>}
-            <div className="timerText"><span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span></div>
+            <div className="timerText"><span>{hours.toString().padStart(2, '0')}</span>:
+            <span>{minutes.toString().padStart(2, '0')}</span>:<span>{seconds.toString().padStart(2, '0')}</span></div>
             <button className="button is-link" onClick={initializeGame}>New Game</button>
           </div>
-          <div className={gameStatus==='Paused'?'disabled':''}>
+          <div className={`boardDiv ${gameStatus==='Paused'?'disabled':''}`}>
             {boardData && boardData.map(((rowData,rowIndex)=>{
               return (
                   <div key={'row-'+rowIndex}>
@@ -187,9 +254,22 @@ function App() {
             })
             )}
           </div>
-          <div className="puzzleBottomButtons mt-2 buttons are-medium">
+          <div className="puzzleBottomButtons mt-2 buttons">
             <button className="button is-danger" onClick={resetSudoku}>Reset Sudoku</button>
-            <button className="button is-primary" onClick={()=>{solveSudoku(currentBoardOriginalData.current)}}>Solve Sudoku</button>
+            <button className="button is-primary" onClick={()=>{isSudokuSolved(boardData,true)}}>Submit Sudoku</button>
+            <button className="button is-warning" onClick={()=>{solveSudoku(currentBoardOriginalData.current)}}>Solve Sudoku</button>
+          </div>
+          {showResultFlag!==false && <div className={`message ${showResultFlag==='Pass'?'is-success':'is-danger'}`}>
+            <div className="message-header">
+              <p>Result</p>
+              <button className="delete" aria-label="delete" onClick={()=>{setShowResultFlag(false)}}></button>
+            </div>
+            <div className="message-body">
+              {showResultFlag === 'Pass' && <span><strong>Good Job!</strong> You have sucessfully cleared this puzzle.</span>}
+              {showResultFlag === 'Fail' && <span><strong>Sorry!</strong> This solution is not correct, please check again.</span>}
+            </div>
+          </div>
+          }
           </div>
         </main>
       </div>

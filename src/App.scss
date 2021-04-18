@@ -8,27 +8,66 @@
 }
 
 .App-header {
-  color: $black;
+  color: $light-primary-color;
   text-align: left;
   font-size: 3rem;
-  @media only screen and (max-width: 768px){
-    text-align: center;
-  }
+  font-weight: 800;
 }
 
 .App-content {
   margin-top: 1rem;
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
 }
 
-.rulesStats, .puzzleArea{
-  
+.button.is-link{
+  background-color: $light-primary-color!important;
+}
+.button{
+  box-shadow: 0 5px 10px 0px #a4a4a4!important;
+  font-family: 'Lato', sans-serif!important;
+  font-weight: 800!important;
+}
+
+.stats{
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+.statLabels, .statValues{
+  font-size: 1.5rem;
+  color: $light-primary-color;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: space-evenly;
+  flex-flow: column;
 }
 
 .puzzleTopButtons, .puzzleBottomButtons{
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.puzzleArea{
+  flex:2;
+  justify-content: center;
+  display: flex;
+}
+
+.rulesStats{
+  flex:1;
+  color: $light-primary-color;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-evenly;
+}
+
+.boardDiv{
+  padding: 2px;
 }
 
 .timerText{
@@ -41,4 +80,31 @@
   pointer-events: none;
   opacity: 0.3;
   background-color: #2E335C;
+}
+
+//mobile and tablet resolutions
+@media only screen and (max-width: 768px){
+
+  .App{
+    padding: 1rem;
+  }
+  .App-header {
+    text-align: center;
+  }
+  .puzzleArea{
+    order: 1;
+  }
+  
+  .rulesStats{
+    order: 2;
+  }
+
+  .App-content {
+    flex-flow: column;
+  }
+
+  .puzzleTopButtons, .puzzleBottomButtons{
+    justify-content: space-around;
+  }
+
 }
