@@ -246,7 +246,10 @@ function App() {
                       return (
                       <SudokuInputBox updateSudokuData={updateSudokuData} value={cell} validate={isSudokuEntryValid}
                       id={'row-'+rowIndex+'-col-'+index}
-                      key={'row-'+rowIndex+'-col-'+index} />
+                      key={'row-'+rowIndex+'-col-'+index}
+                      rowIndex={rowIndex}
+                      colIndex={index}
+                      />
                       )
                     })}
                   </div>

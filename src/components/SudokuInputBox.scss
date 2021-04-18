@@ -1,8 +1,11 @@
+@import '../colors.scss';
+
 .sudokuCell {
     width: 70px;
     height: 70px;
     text-align: center;
     font-size: 1.5rem;
+    border: 1pt solid $light-secondary-color;
     @media only screen and (max-width: 700px){
       width: 35px;
       height: 35px;
@@ -14,6 +17,37 @@
       height: 25px
     }
 }
+
+.highlight-left-border{
+  border-left-color: $light-primary-color;
+  border-left-width: 2pt;
+}
+
+.highlight-right-border{
+  border-right-color: $light-primary-color;
+  border-right-width: 2pt;
+}
+
+.highlight-top-border{
+  border-top-color: #2E335C;
+  border-top-width: 2pt;
+}
+
+.highlight-bottom-border{
+  border-bottom-color: #2E335C;
+  border-bottom-width: 2pt;
+}
+
+.highlight-cell{
+  background-color: $light-secondary-color;
+}
+.clear-cell{
+  background-color: transparent;
+}
+
+
+
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -24,3 +58,4 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
